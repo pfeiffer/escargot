@@ -29,7 +29,6 @@ module Escargot
 
     # deletes all index versions older than the current one
     def prune_index_versions(index)
-      puts index
       current_version = current_index_version(index)
       return unless current_version
       old_versions = index_versions(index).select{|version| version_timestamp(version) < version_timestamp(current_version)}
