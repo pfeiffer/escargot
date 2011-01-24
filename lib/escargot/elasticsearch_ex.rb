@@ -50,10 +50,10 @@ module Escargot
   end
   
   module HitExtensions
-    def to_activerecord
+    def to_activerecord(options = {})
       model_class = _type.gsub(/-/,'/').classify.constantize
       begin
-        model_class.find(id) 
+        model_class.find(id.to_i, options) 
       rescue ActiveRecord::RecordNotFound
         nil
       end
