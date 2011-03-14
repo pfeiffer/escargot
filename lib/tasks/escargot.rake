@@ -5,7 +5,7 @@
 
 namespace :escargot do
   desc "indexes the models"
-  task :index, :models, :needs => [:environment, :load_all_models] do |t, args|
+  task :index, :models, :needs => [:environment] do |t, args|
     each_indexed_model(args) do |model|
       puts "Indexing #{model}"
       Escargot::LocalIndexing.create_index_for_model(model)
@@ -13,7 +13,7 @@ namespace :escargot do
   end
 
   desc "indexes the models"
-  task :distributed_index, :models, :needs => [:environment, :load_all_models] do |t, args|
+  task :distributed_index, :models, :needs => [:environment] do |t, args|
     each_indexed_model(args) do |model|
       puts "Indexing #{model}"
       Escargot::DistributedIndexing.create_index_for_model(model)
@@ -21,7 +21,7 @@ namespace :escargot do
   end
   
   desc "prunes old index versions for this models"
-  task :prune_versions, :models, :needs => [:environment, :load_all_models] do |t, args|
+  task :prune_versions, :models, :needs => [:environment] do |t, args|
     each_indexed_model(args) do |model|
       $elastic_search_client.prune_index_versions(model.index_name)
     end
