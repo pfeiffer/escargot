@@ -13,7 +13,7 @@ and (if you want to use the **optional** distributed indexing mode) Redis.
 Usage
 =======
 
-First, [download and start ElasticSearch](http://www.elasticsearch.com/docs/elasticsearch/setup/installation/) (it's really simple). With the default setup of
+First, [download](http://www.elasticsearch.org/download/) and [start ElasticSearch](http://www.elasticsearch.org/guide/reference/setup/installation.html) (it's really simple). With the default setup of
 of ElasticSearch (listening to localhost and port 9200) no configuration of the plugin is 
 necessary. 
 
@@ -132,14 +132,14 @@ Pagination
   
 Query DSL
 ----------------
-Instead of a string, you can pass a query in ElasticSearch's [Query DSL](http://www.elasticsearch.com/docs/elasticsearch/rest_api/query_dsl/)
+Instead of a string, you can pass a query in ElasticSearch's [Query DSL](http://www.elasticsearch.org/guide/reference/query-dsl/)
 giving you access to the full range of search features. 
 
-    Bird.search(:match_all => true}  
+    Bird.search(:match_all => { })  
       
     Bird.search(:fuzzy => {:name => 'oriale'})
 
-    Bird.search(:custom_score => {:query => {:match_all => true}, :script => "random()"})
+    Bird.search(:custom_score => {:query => {:match_all => { } }, :script => "random()"})
     
     Bird.search(:dis_max => {
       :tie_breaker => 0.7,
@@ -162,7 +162,27 @@ giving you access to the full range of search features.
         }
       }
     )
-  
+
+ 
+Query DSL with API Search
+----------------  
+Any query Hash in Escargot a is a Query DSL by default, so anything you put in the first param is wrapper with
+the term "query", but sometimes you need puts some params out Query DSL, using options of [API Search](http://www.elasticsearch.org/guide/reference/api/search/), you can do this
+using the option *:query_dsl => false* in the query Hash, of course remember to put the term *:query => {your query}* to work correctly
+    
+    User.search (
+        :track_scores =>true, 
+        :sort =>[ {
+                    :name => {:reverse => true }
+                  }
+                ],
+        :query => {
+                    :term => {:name => "john"}
+                  }, 
+        :query_dsl => false
+    )
+
+
 Facets
 ----------------
   
@@ -234,7 +254,7 @@ If you want the search to be insensitive to accents and other diacritics:
     end
 
 The full list of available options for index creation is documented at
-[http://www.elasticsearch.com/docs/elasticsearch/index_modules/](http://www.elasticsearch.com/docs/elasticsearch/index_modules/)
+[http://www.elasticsearch.org/guide/reference/index-modules/](http://www.elasticsearch.org/guide/reference/index-modules/)
 
 Mapping options
 ----------------
@@ -259,7 +279,7 @@ Some examples:
     end
 
 
-See the [ElasticSearch Documentation](http://www.elasticsearch.com/docs/elasticsearch/mapping/) for mappings.
+See the [ElasticSearch Documentation](http://www.elasticsearch.org/guide/reference/mapping/) for mappings.
 
 Distributed indexing
 =======
@@ -330,6 +350,20 @@ When a document is saved and index updates are enabled, both the current index v
 and any version that's in progress will be updated. This ensures that when the new
 index is published it will include the change. 
 
+Searching multiple models
+================
+You can use all the same syntax to search across all indexed models in your application:
+
+    Escargot.search "dreams"
+
+Calling `Escargot.search "dreams"` will return all objects that match, no matter what model they are from, ordered by relevance
+
+If you want to limit global searches to a few specific models, you can do so with the `:classes` option
+
+    Escargot.search "dreams", :classes => [Post, Bird]
+
+Support similar behavior that `Basic Searching` and `Search counts`
+
 Contributing
 ================
 Fork on GitHub, create a test & send a pull request. 
@@ -348,16 +382,15 @@ Aknowledgements
 Future Plans
 ======
 
-Search features:
-* Field conditions and term filters
-* Searching multiple models
-* Single-table inheritance support
-* (optionally) use the _source field from ES and avoid querying the database 
+* Search features:
+  * Field conditions and term filters
+  * Single-table inheritance support
+  * (optionally) use the _source field from ES and avoid querying the database 
 
-Indexing features:
-* Distributing the task of listing document ids
-* Index partioning
-* Support for non-ActiveRecord models
-* Adding other queue backends
+* Indexing features:
+  * Distributing the task of listing document ids
+  * Index partioning
+  * Support for non-ActiveRecord models
+  * Adding other queue backends
 
 Copyright (c) 2010 Angel Faus & vLex.com, released under the MIT license

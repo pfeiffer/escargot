@@ -30,16 +30,31 @@ class BasicSearchTest < Test::Unit::TestCase
     Escargot::LocalIndexing.create_index_for_model(User)
   end
 
+  def teardown
+    User.delete_all
+    User.delete_index
+  end
+
   def test_search_count
     results = User.search("peter")
     assert_equal results.total_entries, 2
     assert_equal User.search_count("peter"), 2
   end
-  
+
   def test_search_count_with_query
-    results = User.search(:term => {:name => "John the Long"})
-    assert_equal results.total_entries, 1
-    assert_equal User.search_count(:term => {:name => "John the Long"}), 1
+    results = User.search(:term => {:name => "john"})
+    assert_equal results.total_entries, 2
+    assert_equal User.search_count(:term => {:name => "john"}), 2
+  end
+  
+  def test_search_without_query_dsl
+    # By default in Escargot any query Hash is a Query DSL, so anything you put in the first param is wrapper with
+    # this "query = {:query => {query}}", but sometimes if you need puts some params OUT Query DSL you can do this
+    # putting in the query Hash the option ":query_dsl => false", of course remember to put the term ":query => {your query}"
+    # to work correctly
+
+    results = User.search(:sort =>[{ :country_code => {:reverse => true }}] , :query => {:term => {:name => "john"}}, :query_dsl => false,:track_scores =>true)
+    assert_equal results.first.name, 'John the Skinny Too'
   end
   
   def test_facets

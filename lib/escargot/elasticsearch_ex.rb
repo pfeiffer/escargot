@@ -44,11 +44,11 @@ module Escargot
     
     private
       def version_timestamp(version)
-        version.gsub(/^.*_/, "").to_i
+        version.gsub(/^.*_/, "").to_f
       end
     
   end
-  
+
   module HitExtensions
     def to_activerecord(options = {})
       model_class = _type.gsub(/-/,'/').classify.constantize
@@ -59,4 +59,5 @@ module Escargot
       end
     end
   end
+
 end
