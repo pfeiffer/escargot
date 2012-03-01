@@ -9,6 +9,14 @@ require 'escargot/queue_backend/resque'
 
 
 module Escargot
+  def self.namespace
+    @@namespace || Rails.env
+  end
+  
+  def self.namespace=(namespace)
+    @@namespace = namespace
+  end
+  
   def self.register_model(model)
     return unless model.table_exists?
     @indexed_models ||= []
