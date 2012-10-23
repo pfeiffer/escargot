@@ -20,15 +20,13 @@ unless File.exists?(config_file)
 else
   config = YAML.load_file(config_file)
   
-  if config = config[Rails.env]
-    host = config["host"]
-    port = config["port"]
-    timeout = config["timeout"]
+  begin
+    servers = config[Rails.env][:hosts]
+  rescue
+    # Couldn't parse
   end
   
-  host    ||= "localhost"
-  port    ||= "9200"
-  timeout ||= 20
+  servers ||= ['localhost:9200']
   
-  $elastic_search_client ||= ElasticSearch.new("#{host}:#{port}", :timeout => timeout)
+  $elastic_search_client ||= ElasticSearch.new(servers)
 end
