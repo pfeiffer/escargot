@@ -10,11 +10,11 @@ require 'escargot/queue_backend/resque'
 
 module Escargot
   def self.namespace
-    @@namespace || Rails.env
+    @namespace || Rails.env
   end
   
   def self.namespace=(namespace)
-    @@namespace = namespace
+    @namespace = namespace
   end
   
   def self.register_model(model)
